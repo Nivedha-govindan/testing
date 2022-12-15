@@ -1,4 +1,3 @@
-
 param(
 [string] $RG_NAME,
 [string] $REGION,
