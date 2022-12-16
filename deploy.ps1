@@ -1,16 +1,9 @@
-#param(
-#[string] $RG_NAME,
-#[string] $REGION,
-#[string] $WORKSPACE_NAME
-#)
+param(
+[string] $RG_NAME,
+[string] $REGION,
+[string] $WORKSPACE_NAME
+)
 
-$RG_NAME = "databricks-rg"
-$REGION = "centralindia"
-$WORKSPACE_NAME = "bricksnivshre"
-
-
-Write-Host "Cluster Creation script started"
- 
 if ((Get-Module -ListAvailable Az.Accounts) -eq $null)
 {
     Install-Module -Name Az.Accounts -Force
