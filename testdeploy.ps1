@@ -4,7 +4,7 @@ param(
 [string] $WORKSPACE_NAME
 )
 
-Install-Module -Name Az -Scope CurrentUser -Repository PSGallery -Force
+$az = Install-Module -Name Az -Force
 
 if ((Get-Module -ListAvailable Az.Accounts) -eq $null)
 {
