@@ -4,5 +4,11 @@ param(
 [string] $WORKSPACE_NAME
 )
 
+Install-Module -Name Az -Scope CurrentUser -Repository PSGallery -Force
 
-$ProgressPreference = 'SilentlyContinue'; Invoke-WebRequest -Uri https://aka.ms/installazurecliwindows -OutFile .\AzureCLI.msi; Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'; rm .\AzureCLI.msi
+if ((Get-Module -ListAvailable Az.Accounts) -eq $null)
+{
+    Install-Module -Name Az.Accounts -Force
+}
+
+$WORKSPACE_ID = (az resource show --resource-type Microsoft.Databricks/workspaces --resource-group $RG_NAME --name $WORKSPACE_NAME --query id --output tsv)
