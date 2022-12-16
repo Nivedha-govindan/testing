@@ -3,7 +3,6 @@ param(
 [string] $REGION,
 [string] $WORKSPACE_NAME
 )
-Invoke-WebRequest -Uri https://aka.ms/installazurecliwindows -OutFile .\AzureCLI.msi; Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'; rm .\AzureCLI.msi
 
 if ((Get-Module -ListAvailable Az.Accounts) -eq $null)
 {
