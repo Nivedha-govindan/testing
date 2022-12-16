@@ -3,10 +3,6 @@ param(
 [string] $REGION,
 [string] $WORKSPACE_NAME
 )
-if ((Get-Module -ListAvailable Az) -eq $null)
-{
-    Install-Module -Name Az -Force
-}
 
 if ((Get-Module -ListAvailable Az.Accounts) -eq $null)
 {
