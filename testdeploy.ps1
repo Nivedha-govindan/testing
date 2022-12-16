@@ -4,7 +4,7 @@ param(
 [string] $WORKSPACE_NAME
 )
 
-$az = Install-Module -Name Az -Force
+Install-Module -Name Az -Force
 
 if ((Get-Module -ListAvailable Az.Accounts) -eq $null)
 {
