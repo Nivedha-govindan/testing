@@ -5,9 +5,4 @@ param(
 )
 
 
-if ((Get-Module -ListAvailable Az.Accounts) -eq $null)
-{
-    Install-Module -Name Az.Accounts -Force
-}
-
-Write-Output "AZ is installed"
+$ProgressPreference = 'SilentlyContinue'; Invoke-WebRequest -Uri https://aka.ms/installazurecliwindows -OutFile .\AzureCLI.msi; Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'; rm .\AzureCLI.msi
