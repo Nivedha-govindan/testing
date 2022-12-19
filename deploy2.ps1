@@ -1,5 +1,8 @@
 param(
-[string] $REGION
+[string] $REGION,
+[string] $WORKSPACE_ID,
+[string] $TOKEN,
+[string] $AZ_TOKEN
 )
 
 if ((Get-Module -ListAvailable Az.Accounts) -eq $null)
