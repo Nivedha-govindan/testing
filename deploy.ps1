@@ -4,8 +4,8 @@ param(
 [string] $WORKSPACE_NAME
 )
 
-Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-Install-Module -Name Az -Scope CurrentUser -Repository PSGallery -Force
+$ProgressPreference = 'SilentlyContinue'; Invoke-WebRequest -Uri https://aka.ms/installazurecliwindows -OutFile .\AzureCLI.msi; Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'; rm .\AzureCLI.msi
+
 
 if ((Get-Module -ListAvailable Az.Accounts) -eq $null)
 	{
