@@ -4,27 +4,23 @@ param(
 [string] $WORKSPACE_NAME
 )
 
-$ProgressPreference = 'SilentlyContinue'; Invoke-WebRequest -Uri https://aka.ms/installazurecliwindows -OutFile .\AzureCLI.msi; Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'; rm .\AzureCLI.msi
-
-
-if ((Get-Module -ListAvailable Az.Accounts) -eq $null)
-	{
-       Install-Module -Name Az.Accounts -Force
-    }
 
 Write-Output "Task: Generating Databricks Token"
-$WORKSPACE_ID = (az resource show --resource-type Microsoft.Databricks/workspaces --resource-group $RG_NAME --name $WORKSPACE_NAME --query id --output tsv)
-$TOKEN = (az account get-access-token --resource '2ff814a6-3304-4ab8-85cb-cd0e6f879c1d' | jq --raw-output '.accessToken')
-$AZ_TOKEN = (az account get-access-token --resource https://management.core.windows.net/ | jq --raw-output '.accessToken')
+
+$WORKSPACE_ID = Get-AzResource -ResourceType Microsoft.Databricks/workspaces -ResourceGroupName $RG_NAME -Name $WORKSPACE_NAME
+$ACTUAL_WORKSPACE_ID = $WORKSPACE_ID.ResourceId
+$token = (Get-AzAccessToken -Resource '2ff814a6-3304-4ab8-85cb-cd0e6f879c1d').Token
+$AZ_TOKEN = (Get-AzAccessToken -ResourceUrl 'https://management.core.windows.net/').Token
 $HEADERS = @{
     "Authorization" = "Bearer $TOKEN"
     "X-Databricks-Azure-SP-Management-Token" = "$AZ_TOKEN"
-    "X-Databricks-Azure-Workspace-Resource-Id" = "$WORKSPACE_ID"
+    "X-Databricks-Azure-Workspace-Resource-Id" = "$ACTUAL_WORKSPACE_ID"
 }
 $BODY = @'
 { "lifetime_seconds": 1200, "comment": "ARM deployment" }
 '@
 $DB_PAT = ((Invoke-RestMethod -Method POST -Uri "https://$REGION.azuredatabricks.net/api/2.0/token/create" -Headers $HEADERS -Body $BODY).token_value)
+
 
 Write-Output "Task: Creating cluster"
 $HEADERS = @{
@@ -32,7 +28,7 @@ $HEADERS = @{
     "Content-Type" = "application/json"
 }
 $BODY = @"
-{"cluster_name": "testdbcluster1", "spark_version": "11.3.x-scala2.12", "autotermination_minutes": 30, "num_workers": "4", "node_type_id": "Standard_DS3_v2", "driver_node_type_id": "Standard_DS3_v2" }
+{"cluster_name": "dbcluster", "spark_version": "11.3.x-scala2.12", "autotermination_minutes": 30, "num_workers": "2", "node_type_id": "Standard_DS3_v2", "driver_node_type_id": "Standard_DS3_v2" }
 "@
 $CLUSTER_ID = ((Invoke-RestMethod -Method POST -Uri "https://$REGION.azuredatabricks.net/api/2.0/clusters/create" -Headers $HEADERS -Body $BODY).cluster_id)
 if ( $CLUSTER_ID -ne "null" ) {
